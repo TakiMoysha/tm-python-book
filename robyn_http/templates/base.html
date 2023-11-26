@@ -1,0 +1,19 @@
+<!DOCTYPE >
+<html>
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    {% block head-links %}{% endblock %}
+  </head>
+  <body>
+    {% block body %}
+      <div class="main">
+        {% block main %}
+          <div class="grid">
+            <span>{{ framework }}</span>
+            <span>{{ templating_engine }}</span>
+          </div>
+        {% endblock %}
+      </div>
+    {% endblock %}
+  </body>
+</html>
