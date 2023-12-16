@@ -1,11 +1,12 @@
+# import os
 import pathlib
 
 from robyn import Request, Response, Robyn, jsonify, SubRouter
 from robyn.logger import Logger
-from robyn.templating import JinjaTemplate
+from robyn.templating import JinjaTemplate, 
 from robyn.ws import WebSocket
 
-# setup
+# settings
 app = Robyn(__file__)
 logger = Logger()
 
@@ -15,7 +16,7 @@ jinja_templates = JinjaTemplate(current_file_path / "templates")
 
 @app.get("/")
 async def default(request):
-    return f"Hello, {request.ip_addr}!"
+    return "Hello, World!"
 
 @app.get("/dashboard")
 async def index(request: Request):
@@ -49,13 +50,15 @@ async def post_log_lifecycle_req(response: Response):
 
 
 # # before/after on all requests
-@app.before_request()
-async def before_request(request: Request):
-    return request
-
-@app.after_request()
-async def after_request(response: Response):
-    return response
+# @app.before_request()
+# async def before_request(request: Request):
+#     print("before_request")
+    # return request
+#
+# @app.after_request()
+# async def after_request(response: Response):
+#     print("after_request")
+    # return response
 
 # websockets
 notif_ws = WebSocket(app, "/notifications")
@@ -72,9 +75,7 @@ async def notify_message(message):
 async def notify_disconnect():
     return "Disconnected from notifications"
 
-
-# sub domain
-## prefix not work?
+# spa router
 spa_router = SubRouter(__name__, prefix="/spa")
 
 @spa_router.get("/")
@@ -82,33 +83,15 @@ async def single_page_app(request: Request):
     return "Stub endpoint"
 
 # view
-@spa_router.view("/sync/view/:id")
 def sync_decorator_view():
-    def get(request: Request):
-        return {
-            "status_code": 200,
-            "description": "OK",
-            "body": {"id": request.path_params["id"]},
-        }
+    def get():
+        return "Sync decorator view"
 
     def post(request: Request):
         body = request.body
-        return {"status_code": 201, "description": body, "body": {"num": 6}}
-
-# error handler
-@app.get("/error")
-def error(request: Request):
-    raise Exception("Error!")
-
-# not work?
-@app.exception
-def handle_exception(error):
-    return {
-        "status_code": 501,
-        "description": "Not Implemented",
-        "body": {"error": error},
-    }
+        return {"status_code": 201, "description": body}
 
 # runner
 app.include_router(spa_router)
+app.add_view('/sync/view/decorator', sync_decorator_view)
 app.start(port=8080)
