@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "taki-ps"
+version = "0.1.0"
+description = ""
+authors = ["TakiMoysha <mpwema782@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flit = "^3.9.0"
+fastapi = "^0.108.0"
+daphne = "^4.0.0"
+python-dotenv = "^1.0.0"
+
+[build-system]
+requires = ["flit_core >=3.9.0"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "taki_ps"
+authors = [{ name = "TakiMoysha", email = "mpwema782@gmailcom" }]
+dynamic = ["version", "description"]
+readme = "README.md"
+
+[project.urls]
+Home = "https://github.com/TakiMoysha/TakiProsto-Server"
