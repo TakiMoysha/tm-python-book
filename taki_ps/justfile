@@ -1,2 +1,8 @@
-run:
-  daphne src.taki_ps.asgi:app
+default:
+  just --list --unsorted
+
+dev:
+  daphne src.taki_ps.asgi:app 
+
+comm args="":
+  cd src && python -m taki_ps {{args}}

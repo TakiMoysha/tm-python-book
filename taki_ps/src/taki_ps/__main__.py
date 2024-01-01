@@ -1,6 +1,4 @@
-from .asgi import app
+from taki_ps.commands import cli as root_cli
 
 if __name__ == "__main__":
-    import daphne
-
-    daphne.run(app, host="0.0.0.0", port=8000)
+    root_cli()
