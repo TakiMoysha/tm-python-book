@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.11"
 sqlalchemy = "^2.0.23"
 mypy = "^1.7.1"
+flit = "^3.9.0"
 
 [tool.poetry.group.robyn_http.dependencies]
 robyn = "^0.46.0"
