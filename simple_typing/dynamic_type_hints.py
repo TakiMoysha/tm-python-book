@@ -1,5 +1,6 @@
 from functools import cached_property
 
+
 class BaseSpell:
     spell_name: str
     spell_description: str
@@ -24,7 +25,6 @@ class FireBall(BaseSpell, FireSchool):
         exit(exitcode + 42)
 
 
-
 class SpellBook:
     _spells: dict[str, BaseSpell]
 
@@ -41,6 +41,5 @@ class SpellBook:
 if __name__ == "__main__":
     # SpellBook dynamically assigns names to attributes,
     # for solve this problem using stubgen from mypy
-    spells = SpellBook({ "meteor": FireBall() })
+    spells = SpellBook({"meteor": FireBall()})
     spells.meteor()
-
