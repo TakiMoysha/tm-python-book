@@ -1,10 +1,12 @@
 import logging
 import random
+import sys
 import threading
 import time
 from os import getenv
 from queue import Queue
 
+import yappi
 from faker import Faker
 
 logging.basicConfig(
@@ -45,7 +47,7 @@ def producer(
     for _ in range(size):
         value = ( 
             faker.ascii_email()
-            if random.randint(0, 10) < 0
+            if random.randint(0, 10) < 5
             else to_palindrome(faker.ascii_email())
         )  # fmt: off
 
@@ -97,6 +99,12 @@ def main():
     queue = Queue()
     local_data = threading.local()
 
+    # ------------------------------
+    t1 = time.perf_counter(), time.process_time()
+    yappi.set_clock_type("cpu")
+    yappi.start()
+    # ------------------------------
+
     producers = [
         threading.Thread(
             name=f"producer_{i}",
@@ -126,11 +134,22 @@ def main():
 
     # time.sleep(10)
     try:
-        for thread in thread_group:
-            thread.join()
+        time.sleep(60)
     except KeyboardInterrupt:
         logging.info("Stopping...")
         stop_event.set()
+    finally:
+        for thread in thread_group:
+            thread.join()
+
+        yappi.stop()
+
+        t2 = time.perf_counter(), time.process_time()
+        yappi.get_func_stats().print_all()
+        yappi.get_thread_stats().print_all()
+
+        logging.info(f"TIME: {t2[0] - t1[0]:.2f} seconds")
+        logging.info(f"CPU TIME: {t2[1] - t1[1]:.2f} seconds")
 
 
 if __name__ == "__main__":
