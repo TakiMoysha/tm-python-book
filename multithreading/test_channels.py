@@ -1,3 +1,7 @@
+"""
+- producer-consumer problem https://en.wikipedia.org/wiki/Producer–consumer_problem
+"""
+
 import logging
 import random
 import sys
@@ -132,7 +136,6 @@ def main():
     # for prod in producers: prod.start() # noqa
     # fmt: on
 
-    # time.sleep(10)
     try:
         time.sleep(60)
     except KeyboardInterrupt:
