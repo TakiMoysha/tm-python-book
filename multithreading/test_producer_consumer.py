@@ -2,6 +2,7 @@
 - producer-consumer problem https://en.wikipedia.org/wiki/Producer–consumer_problem
 """
 
+from concurrent.futures import ThreadPoolExecutor
 import logging
 import random
 import sys
@@ -15,8 +16,32 @@ from faker import Faker
 
 logging.basicConfig(
     level=getenv("LOG_LEVEL", "INFO"),
-    format="%(threadName)s: %(message)s",
+    format="[%(asctime)s]: <%(threadName)s> %(message)s",
 )
+
+
+# ================================================
+def yappi_wrap(fn):
+    def wrapper(*args, **kwargs):
+        t1 = time.perf_counter(), time.process_time()
+        yappi.set_clock_type("cpu")
+        yappi.start()
+
+        try:
+            fn(*args, **kwargs)
+        except Exception:
+            pass
+        finally:
+            yappi.stop()
+            t2 = time.perf_counter(), time.process_time()
+            yappi.get_func_stats().print_all()
+            yappi.get_thread_stats().print_all()
+
+            logging.info(f"TIME: {t2[0] - t1[0]:.2f} seconds")
+            logging.info(f"CPU TIME: {t2[1] - t1[1]:.2f} seconds")
+
+    return wrapper
+
 
 # ================================================
 faker = Faker()
@@ -37,15 +62,13 @@ def is_palindrome(word: str):
 # ================================================
 
 
-def producer(
+def manual_producer(
     cond: threading.Condition,
     queue: Queue,
     stop_event: threading.Event,
     *,
     size: int = 1_000_000,
-    seed: int = 0,
 ):
-    random.seed(seed)
     logging.info("data_generator")
 
     for _ in range(size):
@@ -64,8 +87,7 @@ def producer(
             break
 
 
-# ================================================
-def consumer(
+def manual_consumer(
     cond: threading.Condition,
     queue: Queue,
     stop_event: threading.Event,
@@ -90,29 +112,18 @@ def consumer(
             break
 
 
-# ================================================
-# ================================================
-# ================================================
-# ================================================
-
-
-def main():
+@yappi_wrap
+def main_manual(execution_time: int = 60):
     logging.info("Starting...")
     condition = threading.Condition()
     stop_event = threading.Event()
     queue = Queue()
     local_data = threading.local()
 
-    # ------------------------------
-    t1 = time.perf_counter(), time.process_time()
-    yappi.set_clock_type("cpu")
-    yappi.start()
-    # ------------------------------
-
     producers = [
         threading.Thread(
             name=f"producer_{i}",
-            target=producer,
+            target=manual_producer,
             args=(condition, queue, stop_event),
         )
         for i in range(1)
@@ -121,7 +132,7 @@ def main():
     consumers = [
         threading.Thread(
             name=f"cons_{i}",
-            target=consumer,
+            target=manual_consumer,
             args=(condition, queue, stop_event),
         )
         for i in range(8)
@@ -131,29 +142,67 @@ def main():
     for thread in thread_group:
         thread.start()
 
-    # fmt: off
-    # for thread in consumers: thread.start() # noqa
-    # for prod in producers: prod.start() # noqa
-    # fmt: on
-
     try:
-        time.sleep(60)
+        time.sleep(execution_time)
     except KeyboardInterrupt:
         logging.info("Stopping...")
-        stop_event.set()
     finally:
+        stop_event.set()
         for thread in thread_group:
             thread.join()
 
-        yappi.stop()
 
-        t2 = time.perf_counter(), time.process_time()
-        yappi.get_func_stats().print_all()
-        yappi.get_thread_stats().print_all()
+# ================================================
 
-        logging.info(f"TIME: {t2[0] - t1[0]:.2f} seconds")
-        logging.info(f"CPU TIME: {t2[1] - t1[1]:.2f} seconds")
+
+def pool_producer(queue: Queue, stop_event: threading.Event, *, size: int = 1_000_000):
+    while not stop_event.is_set() or size > 0:
+        value = ( 
+            faker.ascii_email()
+            if random.randint(0, 10) < 5
+            else to_palindrome(faker.ascii_email())
+        )  # fmt: off
+        size -= 1
+        queue.put(value)
+
+
+def pool_consumer(pipeline: Queue, stop_event: threading.Event):
+    while not stop_event.is_set() or not pipeline.empty():
+        message = pipeline.get()
+
+        if message is None:
+            break
+
+        if is_palindrome(message):
+            logging.info(f"palindrome: {message}")
+        else:
+            logging.info(f"not a palindrome: {message}")
+
+
+@yappi_wrap
+def main_thread_pool(execution_time: int = 60):
+    logging.info("Starting...")
+    condition = threading.Condition()
+    stop_event = threading.Event()
+    queue = Queue()
+    local_data = threading.local()
+
+    pool = ThreadPoolExecutor(max_workers=8)
+    pool.submit(pool_producer, queue, stop_event)
+    pool.submit(pool_consumer, queue, stop_event)
+
+    try:
+        time.sleep(execution_time)
+    except KeyboardInterrupt:
+        logging.info("Stopping...")
+    finally:
+        stop_event.set()
+        pool.shutdown()
 
 
 if __name__ == "__main__":
-    main()
+    exec_time = 10
+    print(f"Execution time: {exec_time} seconds, manual run...")
+    main_manual(exec_time)
+    print(f"Execution time: {exec_time} seconds, theard pool...")
+    main_thread_pool(exec_time)
