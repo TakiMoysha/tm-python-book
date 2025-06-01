@@ -1,14 +1,13 @@
 """Protocol work like as a interface. It defines a set of methods that must be implemented by a class."""
+
 from typing import Protocol
 
 
 # Definition
 class HasLength(Protocol):
-    def __len__(self) -> int:
-        ...
+    def __len__(self) -> int: ...
 
-    def anouther_method(self, num: float) -> str:
-        ...
+    def anouther_method(self, num: float) -> str: ...
 
 
 def print_length(obj: HasLength) -> None:
