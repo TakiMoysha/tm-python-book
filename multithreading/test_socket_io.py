@@ -1,10 +1,10 @@
 import argparse
 import hashlib
-from concurrent.futures import ThreadPoolExecutor
 import logging
 import socket
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from os import getenv
 from threading import Thread
 
@@ -42,7 +42,7 @@ def run_server(host="127.0.0.1", port=33333, free_gil: bool = True):
     else:
         thr = Thread(target=_lifespan_gil_acquired).start()
 
-    logging.info("Starting server...")
+    logging.info(f"Starting server {free_gil=}")
     sock = socket.socket()
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host, port))
@@ -90,9 +90,9 @@ if __name__ == "__main__":
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--server", action="store_true")
     parser.add_argument(
-        "--free-gil",
+        "--convoy-effect",
         action="store_true",
-        help="Use lifespan with free gil",
+        help="Use lifespan with cpu-bount gil, socket (i/o) cannot acquire GIL and significant performance drops",
     )
 
     group.add_argument("--client", action="store_true")
@@ -105,6 +105,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.server:
-        run_server(free_gil=args.free_gil)
+        run_server(free_gil=not args.convoy_effect)
     elif args.client:
         run_client(count=args.count)
+
