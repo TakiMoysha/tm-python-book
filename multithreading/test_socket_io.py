@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 from concurrent.futures import ThreadPoolExecutor
 import logging
 import socket
@@ -13,18 +14,34 @@ logging.basicConfig(
 )
 
 
-def server_handle_client(sock):
-    while True:
-        received_data = sock.recv(4096)
-        if not received_data:
-            break
-        sock.sendall(received_data)
+def run_server(host="127.0.0.1", port=33333, free_gil: bool = True):
+    def _lifespan_gil_free():
+        value = b"0"
+        while True:
+            # value = hashlib.sha256(value).digest()
+            time.sleep(1)
 
-    logging.info(f"Client disconnected: {sock.getpeername()}")
-    sock.close()
+    def _lifespan_gil_acquired():
+        value = 0
+        while True:
+            value += 1
+            value -= 1
 
+    def _handle_client(sock):
+        while True:
+            received_data = sock.recv(4096)
+            if not received_data:
+                break
+            sock.sendall(received_data)
 
-def run_server(host="127.0.0.1", port=33333):
+        logging.info(f"Client disconnected: {sock.getpeername()}")
+        sock.close()
+
+    if free_gil:
+        thr = Thread(target=_lifespan_gil_free).start()
+    else:
+        thr = Thread(target=_lifespan_gil_acquired).start()
+
     logging.info("Starting server...")
     sock = socket.socket()
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -33,7 +50,7 @@ def run_server(host="127.0.0.1", port=33333):
     while True:
         client_sock, addr = sock.accept()
         logging.info(f"Connection from {addr}")
-        Thread(target=server_handle_client, args=(client_sock,)).start()
+        Thread(target=_handle_client, args=(client_sock,)).start()
 
 
 def run_client(count: int = 1):
@@ -72,18 +89,22 @@ if __name__ == "__main__":
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--server", action="store_true")
-    group.add_argument("--client", action="store_true")
+    parser.add_argument(
+        "--free-gil",
+        action="store_true",
+        help="Use lifespan with free gil",
+    )
 
+    group.add_argument("--client", action="store_true")
     parser.add_argument(
         "--count",
         type=int,
         help="Number of clients to run",
         required="--client" in sys.argv,
     )
-
     args = parser.parse_args()
 
     if args.server:
-        run_server()
+        run_server(free_gil=args.free_gil)
     elif args.client:
         run_client(count=args.count)
