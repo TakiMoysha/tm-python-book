@@ -156,7 +156,7 @@ def main_manual(execution_time: int = 60):
 
 
 def pool_producer(queue: Queue, stop_event: threading.Event, *, size: int = 1_000_000):
-    while not stop_event.is_set() or size > 0:
+    while size > 0:
         value = ( 
             faker.ascii_email()
             if random.randint(0, 10) < 5
@@ -165,9 +165,12 @@ def pool_producer(queue: Queue, stop_event: threading.Event, *, size: int = 1_00
         size -= 1
         queue.put(value)
 
+        if stop_event.is_set():
+            break
+
 
 def pool_consumer(pipeline: Queue, stop_event: threading.Event):
-    while not stop_event.is_set() or not pipeline.empty():
+    while not pipeline.empty():
         message = pipeline.get()
 
         if message is None:
@@ -178,6 +181,8 @@ def pool_consumer(pipeline: Queue, stop_event: threading.Event):
         else:
             logging.info(f"not a palindrome: {message}")
 
+        if stop_event.is_set():
+            break
 
 @yappi_wrap
 def main_thread_pool(execution_time: int = 60):
