@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Protocol, override
 
+import pytest
+
 
 # =====================================================================
 
@@ -69,3 +71,8 @@ class PaymentCoordinator:
             order_service.cancel()
             payment_service.cancel()
             notification_service.cancel()
+
+
+def test_saga() -> None:
+    coordinator = PaymentCoordinator()
+    coordinator.order_process(OrderData(1), "payment_data", "notification_data")

@@ -14,3 +14,8 @@ dependencies = [
 research = [
     "yappi>=1.6.10",
 ]
+
+[tool.uv.workspace]
+members = [
+    "patterns",
+]

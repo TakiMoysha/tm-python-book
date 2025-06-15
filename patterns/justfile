@@ -1,6 +1,6 @@
 set dotenv-load
 
-[working-directory: "libs/saga"]
-test-saga target="tests" *ARGS:
-  uv run pytest {{ ARGS }} {{ target }}
+# ex: just pytest -v -s src/mediator.py
+pytest *ARGS:
+  uv run pytest {{ ARGS }}
 
