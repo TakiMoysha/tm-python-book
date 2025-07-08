@@ -11,6 +11,9 @@ dependencies = [
 ]
 
 [dependency-groups]
+dev = [
+    "msgspec",
+]
 research = [
     "yappi>=1.6.10",
 ]
