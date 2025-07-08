@@ -9,9 +9,6 @@ dependencies = []
 [tool.uv]
 default-groups = ["dev", "linting", "test"]
 
-[tool.uv.workspace]
-members = ["libs/*"]
-
 
 [dependency-groups]
 dev = ["aiosqlite>=0.21.0"]
