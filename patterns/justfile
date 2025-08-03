@@ -1,6 +1,0 @@
-set dotenv-load
-
-# ex: just pytest -v -s src/mediator.py
-pytest *ARGS:
-  uv run pytest {{ ARGS }}
-

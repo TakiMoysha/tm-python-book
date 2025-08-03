@@ -48,6 +48,9 @@ class DomainComponentSecond(ComponentObject):
         self._mediator.notify(self, f"{self.__class__.__name__}:action_accomplished")
 
 
+# ================================================================================ ENTRYPOINT
+
+
 def test_mediator_action() -> None:
     mediator = ActionMediator()
     first = DomainComponentFirst(mediator)

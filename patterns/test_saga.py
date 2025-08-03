@@ -4,15 +4,12 @@ from typing import Protocol, override
 import pytest
 
 
-# =====================================================================
-
-
 @dataclass(frozen=True)
 class OrderData:
     id: int
 
 
-# =====================================================================
+# ---------------------------------------------------------------------
 
 
 class IService(Protocol):
@@ -54,7 +51,7 @@ class PaymentService(IService):
         pass
 
 
-# =====================================================================
+# ---------------------------------------------------------------------
 
 
 class PaymentCoordinator:
@@ -71,6 +68,9 @@ class PaymentCoordinator:
             order_service.cancel()
             payment_service.cancel()
             notification_service.cancel()
+
+
+# ===================================================================== ENTRYPOINT
 
 
 def test_saga() -> None:
