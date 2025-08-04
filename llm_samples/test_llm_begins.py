@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup
 
 LM_STUDIO_URL = getenv("LM_STUDIO_URL", "http://127.0.0.1:1234/v1/chat/completions")
 
+transport = httpx.AsyncHTTPTransport(retries=3)
+
 
 async def load_page_content(url: str):
     async with httpx.AsyncClient() as client:
@@ -21,10 +23,13 @@ async def load_page_content(url: str):
 
     main_article_content = soup.find(["main", "article", "div"], class_="content")
 
-    logging.warning(main_article_content.prettify())
+    if main_article_content is None:
+        raise ValueError("Anchors not found on page")
 
     with open("tmp/test.ignore.html", "w") as f:
-        f.write(main_article_content.prettify())
+        text = main_article_content.prettify()
+        f.write()
+
     return soup
 
 
