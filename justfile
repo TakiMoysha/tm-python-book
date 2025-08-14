@@ -1,8 +1,13 @@
 set dotenv-load
 
-# ex: just run test_filen.py::test_func -v
+
+[doc("""
+Examples:
+    - just run test_file.py::test_func -v 
+    - env TARGET_DIR=/var/media/data STOREDIR=/var/media/ just run tooling::queue_rename.py
+""")]
 test filename:
-    uv run pytest --verbose --capture=no --log-cli-level=INFO {{filename}} $@
+    uv run pytest --verbose --capture=no --log-cli-level=INFO {{filename}}
 
 # ex: just multi "uv run packages/test_opsqueue.py --consumer"
 multi command factor='10':

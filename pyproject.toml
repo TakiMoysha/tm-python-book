@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
  "anyio>=4.9.0",
+ "av>=15.0.0",
  "bs4>=0.0.2",
  "crawl4ai>=0.7.2",
  "faker>=37.3.0",
@@ -20,8 +21,14 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["msgspec"]
-research = ["yappi>=1.6.10"]
+dev = ["av>=15.0.0", "msgspec", "rich>=14.1.0"]
+debug = ["yappi>=1.6.10"]
+
 
 [tool.uv.workspace]
 members = []
+
+[tool.pytest.ini_options]
+markers = [
+ "manual: required manual check",
+]
