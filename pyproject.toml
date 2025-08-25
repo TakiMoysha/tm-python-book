@@ -25,10 +25,6 @@ dev = ["av>=15.0.0", "msgspec", "rich>=14.1.0"]
 debug = ["yappi>=1.6.10"]
 
 
-[tool.uv.workspace]
-members = []
-
 [tool.pytest.ini_options]
-markers = [
- "manual: required manual check",
-]
+markers = ["manual: required manual check"]
+addopts = "-ra -q"

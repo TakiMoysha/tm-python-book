@@ -25,30 +25,23 @@ class OrderService(IService):
         return OrderData(1)
 
     @override
-    def cancel(self):
-        pass
+    def cancel(self): ...
 
 
 class NotificationService(IService):
     _plan = {}
 
-    def send_notify(self, notification_data, order_id):
-        pass
-
+    def send_notify(self, notification_data, order_id): ...
     @override
-    def cancel(self):
-        pass
+    def cancel(self): ...
 
 
 class PaymentService(IService):
     _plan = {}
 
-    def make_payment(self, order_id, payment_data):
-        pass
-
+    def make_payment(self, order_id, payment_data): ...
     @override
-    def cancel(self):
-        pass
+    def cancel(self): ...
 
 
 # ---------------------------------------------------------------------
