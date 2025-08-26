@@ -11,7 +11,7 @@ test filename:
 
 [doc("""
 Examples:
-    - just multi "uv run packages/test_opsqueue.py --consumer"
+    - just multi "uv run packages/case_opsqueue.py --consumer"
 """)]
 multi command factor='10':
     seq {{factor}} | xargs -I {} -P {{factor}} {{command}}

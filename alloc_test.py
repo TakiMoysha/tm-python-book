@@ -1,6 +1,5 @@
 import time
 import threading
-import memray
 
 
 def test_list_realloc():

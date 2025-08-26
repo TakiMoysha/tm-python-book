@@ -18,22 +18,22 @@ DEFAULT_QUEUE_ADDRESS = "localhost:3999"
 DEFAULT_QUEUE_STORAGE = Path("/tmp/queue_storage")
 
 
-
 def _as_fs(path):
     return "file://" + str(path)
+
 
 def producer_start(queue_address: str, file_path: Path):
     producer = ProducerClient(queue_address, _as_fs(file_path.absolute()))
     while True:
         try:
-            words = tuple([random.choice(ascii_lowercase).lower() * random.randint(16, 32) for _ in range(100_000)])
-            logging.info(len(words))
+            words = [random.choice(ascii_lowercase).lower() * random.randint(16, 32) for _ in range(10_000)]
             stream_of_capitalized_words = producer.run_submission(words, chunk_size=10000)
             logging.info(str(stream_of_capitalized_words))
         except KeyboardInterrupt:
             break
 
     pass
+
 
 def consumer_start(queue_address: str, file_path: Path):
     consumer = ConsumerClient(queue_address, _as_fs(file_path))
@@ -63,6 +63,8 @@ if __name__ == "__main__":
         producer_start(DEFAULT_QUEUE_ADDRESS, DEFAULT_QUEUE_STORAGE)
     else:
         parser.print_help()
+
+# ==========================================================================================
 
 
 @pytest.fixture(name="queue_storage", scope="package")
