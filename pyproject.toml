@@ -10,6 +10,7 @@ dependencies = [
  "bs4>=0.0.2",
  "crawl4ai>=0.7.2",
  "faker>=37.3.0",
+ "fusepy>=3.0.1",
  "httpx>=0.28.1",
  "hypothesis>=6.136.7",
  "lmstudio>=1.4.1",
@@ -18,6 +19,7 @@ dependencies = [
  "pyside6>=6.9.0",
  "pytest>=8.3.5",
  "pytest-asyncio>=1.1.0",
+ "telethon>=1.40.0",
 ]
 
 [dependency-groups]
