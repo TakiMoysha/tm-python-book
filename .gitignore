@@ -8,3 +8,5 @@ tmp/**
 result.json
 
 *.bin
+
+*.env
