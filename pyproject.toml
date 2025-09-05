@@ -16,6 +16,7 @@ dependencies = [
  "lmstudio>=1.4.1",
  "opsqueue>=0.30.3",
  "playwright>=1.54.0",
+ "pydantic>=2.11",
  "pyside6>=6.9.0",
  "pytest>=8.3.5",
  "pytest-asyncio>=1.1.0",
