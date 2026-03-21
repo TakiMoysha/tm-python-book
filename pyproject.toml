@@ -31,3 +31,8 @@ debug = ["yappi>=1.6.10"]
 [tool.pytest.ini_options]
 markers = ["manual: required manual check"]
 addopts = "-ra -q"
+
+[tool.uv.workspace]
+members = [
+    "primitives",
+]

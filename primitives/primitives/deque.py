@@ -1,19 +1,20 @@
+import argparse
 from collections import deque
 from time import perf_counter
 
 
-def demo_deque():
-    nums = deque(tuple(range(4)))
-    assert 0 == nums.popleft()
-    assert 1 == nums.popleft()
-
-    assert [2, 3] == list(nums)
-    nums.appendleft(1)
-    nums.appendleft(0)
-    assert [0, 1, 2, 3] == list(nums)
+# ===========================================================
+# ===========================================================
 
 
-def demo_left_insert_deque(times: int):
+def deque_left_insert():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("times", type=int, default=10_000)
+
+    args = parser.parse_args()
+    times = args.times
+
+    # =======================================================
     a_list = []
     a_append_list = []
     a_deque = deque()
@@ -36,7 +37,19 @@ def demo_left_insert_deque(times: int):
     print(f"deque.appendleft() {deque_time:.6} ns  ({gain:.6}x faster)")
 
 
-def demo_random_access_deque(times: int):
+# ===========================================================
+# ===========================================================
+
+
+def deque_random_access():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("times", type=int, default=10_000)
+
+    args = parser.parse_args()
+    times = args.times
+
+    # =======================================================
+
     a_list = [1] * times
     a_deque = deque(a_list)
 
@@ -61,12 +74,3 @@ def demo_random_access_deque(times: int):
 
     print(f"list  {list_time:.6} μs ({gain:.6}x faster)")
     print(f"deque {deque_time:.6} μs")
-
-
-if __name__ == "__main__":
-    print("Deque...")
-    demo_deque()
-    print("Left insert...")
-    demo_left_insert_deque(10_000)
-    print("Random access...")
-    demo_random_access_deque(10_000)
