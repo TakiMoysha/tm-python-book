@@ -86,7 +86,7 @@ def main(input_file: Path, output: Path, logger: logging.Logger):
 if __name__ == "__main__":
     epilog = """\
 examples:
-  python fbx_to_gltf.py -- /full/path/to/file.fbx
+  python fbx_to_gltf.py /full/path/to/file.fbx
   blender --background --python fbx_to_gltf.py -- /full/path/to/file.fbx
   blender -b --python fbx_to_gltf.py -- model.fbx -v debug -o ./tmp/output.gltf
 """
@@ -108,7 +108,12 @@ examples:
 
     # batch_parser = parser.add_subparsers(dest="batch")
 
-    runtime_args = sys.argv[sys.argv.index("--") + 1 :]
+    if "--" in sys.argv:
+        runtime_args = sys.argv[sys.argv.index("--") + 1 :]
+    else:
+        runtime_args = sys.argv[1:]
+
+    print(runtime_args)
     args = parser.parse_args(runtime_args)
 
     logger = resolve_verbosity(args.verbosity)
