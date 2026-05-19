@@ -1,13 +1,10 @@
 import logging
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from os import getenv
-from pathlib import Path
 import sys
+from argparse import ArgumentParser
+from argparse import RawDescriptionHelpFormatter
+from pathlib import Path
 
 import bpy
-
-
-def main(): ...
 
 
 def resolve_verbosity(verbosity: str):
@@ -28,34 +25,19 @@ def resolve_input(value: str) -> Path:
     path = Path(value).resolve()
 
     if not path.exists():
-        logging.error(f"Input file not found: {path}")
-        raise SystemExit(1)
+        raise Exception(f"Input file not found: {path}")
 
     if not path.is_file():
-        logging.error(f"Input path is not a file: {path}")
-        raise SystemExit(1)
+        raise Exception(f"Input path is not a file: {path}")
 
     if path.suffix.lower() != ".fbx":
-        logging.error(f"Input file must be .fbx, got: {path.suffix}")
-        raise SystemExit(1)
+        raise Exception(f"Input file must be .fbx, got: {path.suffix}")
 
     logging.debug(f"Input file resolved: {path}")
     return path
 
 
 def resolve_output(input: Path, output: str) -> Path:
-    """Validate and resolve output path.
-
-    Args:
-        input: Resolved input file path (used for default naming)
-        output: Output directory or filename from CLI
-
-    Returns:
-        Resolved Path object for output file
-
-    Raises:
-        SystemExit: If output directory doesn't exist
-    """
     path = Path(output).resolve()
     default_output = input.with_suffix(".gltf")
 
@@ -73,12 +55,10 @@ def resolve_output(input: Path, output: str) -> Path:
     # If parent directory doesn't exist, error
     parent = path.parent
     if not parent.exists():
-        logging.error(f"Output directory does not exist: {parent}")
-        raise SystemExit(1)
+        raise Exception(f"Output directory does not exist: {parent}")
 
     if not parent.is_dir():
-        logging.error(f"Output parent is not a directory: {parent}")
-        raise SystemExit(1)
+        raise Exception(f"Output parent is not a directory: {parent}")
 
     # Ensure .gltf extension
     if path.suffix.lower() != ".gltf":
@@ -106,9 +86,9 @@ def main(input_file: Path, output: Path, logger: logging.Logger):
 if __name__ == "__main__":
     epilog = """\
 examples:
-  python task_fbx_to_gltf.py -- /full/path/to/file.fbx
-  blender --background --python task_fbx_to_gltf.py -- /full/path/to/file.fbx
-  blender -b --python task_fbx_to_gltf.py -- model.fbx -v debug -o ./tmp/output.gltf
+  python fbx_to_gltf.py -- /full/path/to/file.fbx
+  blender --background --python fbx_to_gltf.py -- /full/path/to/file.fbx
+  blender -b --python fbx_to_gltf.py -- model.fbx -v debug -o ./tmp/output.gltf
 """
 
     parser = ArgumentParser(
@@ -125,6 +105,8 @@ examples:
         help="Verbosity level (default: info)",
     )
     parser.add_argument("-o", "--output", help="Output dir (should exist) or filename", default=".")
+
+    # batch_parser = parser.add_subparsers(dest="batch")
 
     runtime_args = sys.argv[sys.argv.index("--") + 1 :]
     args = parser.parse_args(runtime_args)
